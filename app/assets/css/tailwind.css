@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Styles d'impression (PDF) ────────────────────────────── */
+@media print {
+
+    body,
+    html {
+        background: white !important;
+        color: black !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    /* Masquer le header, bouton retour, boutons d'action */
+    header,
+    [class*="mb-6"]:has(button:only-child),
+    button[title*="Imprimer"],
+    button[title*="Exporter"],
+    button[title*="JSON"] {
+        display: none !important;
+    }
+
+    /* S'assurer que les tableaux et couleurs de statut restent visibles */
+    table {
+        page-break-inside: auto;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    /* Photos : taille réduite pour tenir sur la page */
+    img {
+        max-height: 80px;
+    }
+}

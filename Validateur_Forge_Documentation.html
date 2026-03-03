@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Validateur Forge — Documentation Projet</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 22pt;
+            color: #1a1a2e;
+            border-bottom: 3px solid #16a085;
+            padding-bottom: 8px;
+        }
+
+        h2 {
+            font-size: 16pt;
+            color: #2c3e50;
+            margin-top: 30px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 13pt;
+            color: #34495e;
+            margin-top: 20px;
+        }
+
+        h4 {
+            font-size: 11pt;
+            color: #555;
+            margin-top: 15px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+            font-size: 10pt;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        td {
+            border: 1px solid #ddd;
+            padding: 6px 12px;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+
+        code {
+            background-color: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 10pt;
+            color: #c0392b;
+        }
+
+        pre {
+            background-color: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 10pt;
+            line-height: 1.4;
+        }
+
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+
+        .info-box {
+            background-color: #dff0fe;
+            border-left: 4px solid #2196F3;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .info-box strong {
+            color: #1565C0;
+        }
+
+        .tip-box {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4CAF50;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .tip-box strong {
+            color: #2E7D32;
+        }
+
+        .warning-box {
+            background-color: #fff3e0;
+            border-left: 4px solid #FF9800;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .important-box {
+            background-color: #fce4ec;
+            border-left: 4px solid #e91e63;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .important-box strong {
+            color: #c2185b;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9pt;
+            font-weight: bold;
+        }
+
+        .badge-green {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-red {
+            background: #fce4ec;
+            color: #c62828;
+        }
+
+        .badge-grey {
+            background: #f5f5f5;
+            color: #757575;
+        }
+
+        .badge-blue {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-amber {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        .badge-sky {
+            background: #e0f2fe;
+            color: #0277bd;
+        }
+
+        .meta {
+            color: #888;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin: 4px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>🛡️ Validateur Forge — Documentation Projet</h1>
+
+    <p class="meta"><strong>Dernière mise à jour :</strong> 2 mars 2026 &nbsp;|&nbsp; <strong>Statut :</strong> <span
+            class="badge badge-green">🟢 En développement actif</span></p>
+
+    <hr>
+
+    <!-- ========== SOMMAIRE ========== -->
+    <h2>📋 Sommaire</h2>
+    <ol>
+        <li><a href="#contexte">Contexte &amp; Objectif</a></li>
+        <li><a href="#stack">Stack technique</a></li>
+        <li><a href="#architecture">Architecture applicative</a></li>
+        <li><a href="#flux">Flux utilisateur</a></li>
+        <li><a href="#api">API — Route serveur proxy</a></li>
+        <li><a href="#grille">Grille de comparaison</a></li>
+        <li><a href="#state">Gestion d'état &amp; navigation</a></li>
+        <li><a href="#local">Lancer le projet en local</a></li>
+        <li><a href="#evolutions">Évolutions prévues</a></li>
+    </ol>
+
+    <hr>
+
+    <!-- ========== CONTEXTE ========== -->
+    <h2 id="contexte">📌 Contexte &amp; Objectif</h2>
+
+    <p>Le <strong>Validateur Forge</strong> est un outil interne de <strong>validation et comparaison</strong> des
+        annonces immobilières entre deux environnements :</p>
+
+    <table>
+        <tr>
+            <th>Environnement</th>
+            <th>Rôle</th>
+            <th>URL de base</th>
+        </tr>
+        <tr>
+            <td><strong>PROD</strong> (Immobox)</td>
+            <td>Données de production</td>
+            <td><code>explorimmobox.explorimmo.com</code></td>
+        </tr>
+        <tr>
+            <td><strong>INTEG</strong> (Forge)</td>
+            <td>Données d'intégration</td>
+            <td><code>imb-integration.vip.adencf.local</code></td>
+        </tr>
+    </table>
+
+    <div class="important-box">
+        <strong>⚠️ IMPORTANT</strong> — L'outil permet de détecter rapidement les <strong>écarts de données</strong>
+        entre PROD et INTEG pour une même annonce, en comparant champ par champ les valeurs retournées par les APIs.
+    </div>
+
+    <h3>Problèmes résolus</h3>
+    <ul>
+        <li><strong>CORS</strong> : les APIs Immobox n'autorisent pas les appels cross-origin depuis le navigateur →
+            résolu via un <strong>proxy serveur Nuxt</strong></li>
+        <li><strong>Certificats SSL auto-signés</strong> : l'environnement INTEG utilise un domaine <code>.local</code>
+            avec certificat auto-signé → géré côté serveur (<code>NODE_TLS_REJECT_UNAUTHORIZED</code>)</li>
+    </ul>
+
+    <hr>
+
+    <!-- ========== STACK ========== -->
+    <h2 id="stack">🛠️ Stack technique</h2>
+
+    <table>
+        <tr>
+            <th>Composant</th>
+            <th>Technologie</th>
+            <th>Version</th>
+        </tr>
+        <tr>
+            <td>Framework full-stack</td>
+            <td><strong>Nuxt 3</strong> (Vue.js)</td>
+            <td><code>^4.3.1</code></td>
+        </tr>
+        <tr>
+            <td>Rendu réactif</td>
+            <td><strong>Vue 3</strong></td>
+            <td><code>^3.5.28</code></td>
+        </tr>
+        <tr>
+            <td>Routage</td>
+            <td><strong>Vue Router</strong></td>
+            <td><code>^4.6.4</code></td>
+        </tr>
+        <tr>
+            <td>Styling</td>
+            <td><strong>Tailwind CSS</strong></td>
+            <td>via <code>@nuxtjs/tailwindcss ^6.14.0</code></td>
+        </tr>
+        <tr>
+            <td>Langage</td>
+            <td><strong>TypeScript</strong></td>
+            <td>—</td>
+        </tr>
+        <tr>
+            <td>Proxy API</td>
+            <td><strong>Nitro Server Routes</strong></td>
+            <td>intégré à Nuxt</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- ========== ARCHITECTURE ========== -->
+    <h2 id="architecture">🏗️ Architecture applicative</h2>
+
+    <h3>Arborescence des fichiers</h3>
+
+    <pre><code>Validateur Forge/
+├── app/
+│   ├── app.vue                       # Layout global (header + NuxtPage)
+│   ├── pages/
+│   │   ├── index.vue                 # Page d'accueil — formulaire + liste annonces
+│   │   └── detail.vue                # Page détail — comparaison champ par champ
+│   ├── assets/css/tailwind.css       # Configuration Tailwind
+│   └── composables/
+│       └── useCompare.ts             # Composable partagé — état global + appels API
+├── server/
+│   └── api/
+│       └── compare.ts                # Route serveur proxy (contourne CORS + SSL)
+├── public/
+│   └── logos/
+│       ├── fi.svg                    # Logo Figaro Immobilier
+│       └── plf.svg                   # Logo Propriétés Le Figaro
+├── nuxt.config.ts
+└── package.json</code></pre>
+
+    <h3>Diagramme d'architecture</h3>
+
+    <p style="text-align: center; margin: 20px 0;">
+        <img src="architecture_diagram.png" alt="Diagramme d'architecture Validateur Forge"
+            style="max-width: 100%; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);" />
+    </p>
+
+    <div class="info-box">
+        <strong>ℹ️ Flux résumé</strong> : Page Vue → <code>useCompare()</code> → <code>$fetch("/api/compare")</code> →
+        Server Route Nitro → API externe PROD/INTEG → Réponse JSON → Affichage
+    </div>
+
+    <hr>
+
+    <!-- ========== FLUX ========== -->
+    <h2 id="flux">🔄 Flux utilisateur</h2>
+
+    <ol>
+        <li><strong>Page d'accueil</strong> (<code>/</code>) : l'utilisateur renseigne un <strong>Partenaire</strong> et
+            un <strong>Code Agence</strong></li>
+        <li><em>(Optionnel)</em> Sélection du portail : <strong>Tous</strong> / <strong>FI</strong> (Figaro Immobilier)
+            / <strong>PLF</strong> (Propriétés Le Figaro)</li>
+        <li>Clic <strong>Rechercher</strong> → appel API PROD + INTEG en parallèle → affichage en 2 colonnes</li>
+        <li>Clic sur une annonce → navigation vers la <strong>page détail</strong> (<code>/detail?ref=...</code>)</li>
+        <li><strong>Retour à la liste</strong> → les filtres de recherche sont <strong>automatiquement
+                restaurés</strong> et les résultats toujours affichés</li>
+    </ol>
+
+    <h3>Détail des écrans</h3>
+
+    <h4>🏠 Page d'accueil (<code>/</code>)</h4>
+    <ul>
+        <li><strong>Formulaire de recherche</strong> :
+            <ul>
+                <li><strong>Partenaire</strong> <em>(obligatoire)</em> — select parmi : Apimo, Hektor, Immo-Facile, La
+                    Boite Immo, Netty, Periimmo, Poliris, Rodacom, Ubiflow</li>
+                <li><strong>Code Agence</strong> <em>(obligatoire)</em> — input texte libre</li>
+                <li><strong>Réf Client</strong> <em>(optionnel)</em> — si renseignée, navigation directe vers le détail
+                </li>
+                <li><strong>Portail</strong> <em>(optionnel)</em> — boutons segmentés : Tous / FI / PLF</li>
+                <li><strong>Export CSV</strong> — bouton visible dès qu'il y a des résultats, télécharge la liste
+                    complète des annonces avec référence, type, ville, prix, statut et présence PROD/INTEG</li>
+            </ul>
+        </li>
+        <li><strong>Résultats en 2 colonnes</strong> : PROD (bleu) et INTEG (ambre)</li>
+        <li><strong>Matching automatique</strong> des annonces par référence (<code>property.reference</code>)</li>
+        <li><strong>Pastille de statut</strong> par annonce : ✅ ISO (vert) ou nombre de différences (rouge)</li>
+        <li><strong>Liens JSON</strong> pour ouvrir les URLs API brutes dans un nouvel onglet</li>
+    </ul>
+
+    <h4>📄 Page détail (<code>/detail?ref=...</code>)</h4>
+    <ul>
+        <li><strong>En-tête</strong> : titre, référence, partenaire, code agence, logo du portail (FI/PLF)</li>
+        <li><strong>Résumé statistique dynamique</strong> : compteurs Identiques / Différences (toujours visibles) +
+            Manque INTEG (🟠 ambre) / Manque PROD (🔵 bleu ciel) / Non transmises (affichés uniquement si &gt; 0)</li>
+        <li><strong>Bandeau de statut</strong> : ✅ Succès (vert) si 0 diff + 0 manquante, ⚠️ Attention (ambre) si 0 diff
+            mais des manquantes</li>
+        <li><strong>Galerie photos</strong> PROD vs INTEG côte à côte (dépliable)</li>
+        <li><strong>Tableaux de comparaison</strong> par catégorie (voir section Grille)</li>
+        <li><strong>Exports</strong> :
+            <ul>
+                <li><strong>Imprimer PDF</strong> — ouvre la boîte d'impression du navigateur avec styles dédiés (fond
+                    blanc, masquage des éléments interactifs)</li>
+                <li><strong>Export comparaison JSON</strong> — télécharge un fichier JSON structuré contenant le résumé
+                    statistique et le détail champ par champ avec statuts</li>
+            </ul>
+        </li>
+        <li><strong>Bouton "Retour à la liste"</strong> avec restauration automatique des filtres</li>
+    </ul>
+
+    <hr>
+
+    <!-- ========== API ========== -->
+    <h2 id="api">⚙️ API — Route serveur proxy</h2>
+
+    <p>La route <code>server/api/compare.ts</code> sert de <strong>proxy backend</strong> entre le navigateur et les
+        APIs Immobox.</p>
+
+    <h3>Paramètres d'appel</h3>
+
+    <table>
+        <tr>
+            <th>Paramètre</th>
+            <th>Type</th>
+            <th>Requis</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td><code>partenaire</code></td>
+            <td><code>string</code></td>
+            <td>✅</td>
+            <td>Nom du partenaire (ex : Netty, Apimo)</td>
+        </tr>
+        <tr>
+            <td><code>codeAgence</code></td>
+            <td><code>string</code></td>
+            <td>✅</td>
+            <td>Identifiant de l'agence</td>
+        </tr>
+        <tr>
+            <td><code>refClient</code></td>
+            <td><code>string</code></td>
+            <td>❌</td>
+            <td>Référence client (wildcard <code>*</code> si vide)</td>
+        </tr>
+        <tr>
+            <td><code>mediaId</code></td>
+            <td><code>string</code></td>
+            <td>❌</td>
+            <td>Portail : <code>1</code> = FI, <code>9</code> = PLF</td>
+        </tr>
+        <tr>
+            <td><code>env</code></td>
+            <td><code>string</code></td>
+            <td>✅</td>
+            <td><code>PROD</code> ou <code>INTEG</code></td>
+        </tr>
+    </table>
+
+    <h3>Construction de l'URL API</h3>
+
+    <pre><code>{baseUrl}&amp;filters[property.gateway_code]={codeAgence}_*&amp;filters[status]=3&amp;start=0&amp;limit=1000</code></pre>
+
+    <ul>
+        <li>Si <code>mediaId</code> est renseigné → ajout de <code>&amp;filters[media_id]={mediaId}</code></li>
+        <li>Le filtre <code>gateway_code</code> utilise le pattern <code>{codeAgence}_*</code> (wildcard) pour récupérer
+            toutes les annonces de l'agence</li>
+    </ul>
+
+    <h3>Filtre Portail de publication</h3>
+    <table>
+        <tr>
+            <th>Bouton</th>
+            <th>Valeur <code>mediaId</code></th>
+            <th>Effet</th>
+        </tr>
+        <tr>
+            <td><strong>Tous</strong> <em>(défaut)</em></td>
+            <td><em>vide</em></td>
+            <td>Aucun filtre portail</td>
+        </tr>
+        <tr>
+            <td><strong>FI</strong></td>
+            <td><code>1</code></td>
+            <td>Filtre Figaro Immobilier</td>
+        </tr>
+        <tr>
+            <td><strong>PLF</strong></td>
+            <td><code>9</code></td>
+            <td>Filtre Propriétés Le Figaro</td>
+        </tr>
+    </table>
+
+    <h3>Gestion SSL pour INTEG</h3>
+    <p>Pour l'environnement INTEG (domaine <code>.local</code> avec certificat auto-signé), la variable
+        <code>NODE_TLS_REJECT_UNAUTHORIZED</code> est temporairement mise à <code>0</code> pendant l'appel, puis
+        restaurée.
+    </p>
+
+    <hr>
+
+    <!-- ========== GRILLE ========== -->
+    <h2 id="grille">📊 Grille de comparaison</h2>
+
+    <p>La page détail compare les annonces PROD vs INTEG sur les catégories suivantes :</p>
+
+    <table>
+        <tr>
+            <th>Catégorie</th>
+            <th>Champs comparés</th>
+        </tr>
+        <tr>
+            <td>🏷️ <strong>Identification</strong></td>
+            <td>ID, Code passerelle, Passerelle, Réf. mandat</td>
+        </tr>
+        <tr>
+            <td>📍 <strong>Localisation</strong></td>
+            <td>Ville, Code Postal, Quartier</td>
+        </tr>
+        <tr>
+            <td>🏠 <strong>Caractéristiques</strong></td>
+            <td>Type transaction, Type/Famille de bien, Surface, Terrain, Pièces, Chambres, SdB, Confort, Exposition,
+                Visite virtuelle, Copropriété, État</td>
+        </tr>
+        <tr>
+            <td>📝 <strong>Descriptif</strong></td>
+            <td>Description complète</td>
+        </tr>
+        <tr>
+            <td>⚡ <strong>DPE</strong></td>
+            <td>Date DPE, Consommation énergie, Classe énergie, Émission GES, Classe GES</td>
+        </tr>
+        <tr>
+            <td>👤 <strong>Contact</strong></td>
+            <td>Email, Tél. négociateur, Téléphone, Nom contact</td>
+        </tr>
+        <tr>
+            <td>💰 <strong>Financier</strong></td>
+            <td>Prix, Honoraires, Prix nous consulter, Taxe foncière, Charge honoraires</td>
+        </tr>
+        <tr>
+            <td>📷 <strong>Médias</strong></td>
+            <td>Nombre de photos, Vidéo</td>
+        </tr>
+    </table>
+
+    <h3>Statuts de comparaison</h3>
+
+    <table>
+        <tr>
+            <th>Statut</th>
+            <th>Couleur</th>
+            <th>Signification</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green"><strong>OK</strong></span></td>
+            <td>🟢 Vert</td>
+            <td>Valeurs identiques (comparaison insensible à la casse, trim)</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-red"><strong>DIFF</strong></span></td>
+            <td>🔴 Rouge</td>
+            <td>Valeurs différentes</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-amber"><strong>MANQUE INTEG</strong></span></td>
+            <td>🟠 Ambre</td>
+            <td>Donnée présente en PROD mais absente en INTEG — potentiel dysfonctionnement</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-sky"><strong>MANQUE PROD</strong></span></td>
+            <td>🔵 Bleu ciel</td>
+            <td>Donnée présente en INTEG mais absente en PROD — potentiel dysfonctionnement</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-grey"><strong>N/A</strong></span></td>
+            <td>⚪ Gris</td>
+            <td>Donnée absente des deux côtés (non transmise par la source)</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- ========== STATE ========== -->
+    <h2 id="state">🔗 Gestion d'état &amp; navigation</h2>
+
+    <p>L'état applicatif est géré via le composable <code>useCompare()</code> qui utilise <code>useState</code> de Nuxt
+        (état global partagé côté client).</p>
+
+    <h3>Données persistées entre pages</h3>
+
+    <table>
+        <tr>
+            <th>Donnée</th>
+            <th>Clé <code>useState</code></th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>Résultats PROD</td>
+            <td><code>compare-prodData</code></td>
+            <td>Réponse brute API PROD</td>
+        </tr>
+        <tr>
+            <td>Résultats INTEG</td>
+            <td><code>compare-integData</code></td>
+            <td>Réponse brute API INTEG</td>
+        </tr>
+        <tr>
+            <td>Paramètres de recherche</td>
+            <td><code>compare-searchParams</code></td>
+            <td>Partenaire, Code Agence, Réf Client, Portail</td>
+        </tr>
+        <tr>
+            <td>Référence sélectionnée</td>
+            <td><code>compare-selectedRef</code></td>
+            <td>Référence de l'annonce en cours de consultation</td>
+        </tr>
+    </table>
+
+    <div class="tip-box">
+        <strong>💡 Astuce</strong> — Grâce à la persistance des <code>searchParams</code>, l'utilisateur retrouve ses
+        filtres de recherche intacts lorsqu'il revient à la liste depuis la page détail — <strong>aucun rechargement API
+            n'est nécessaire</strong>.
+    </div>
+
+    <h3>Navigation entre pages</h3>
+    <table>
+        <tr>
+            <th>Action</th>
+            <th>De → Vers</th>
+            <th>Mécanisme</th>
+        </tr>
+        <tr>
+            <td>Clic sur une annonce</td>
+            <td>Accueil → Détail</td>
+            <td><code>router.push("/detail?ref=...")</code></td>
+        </tr>
+        <tr>
+            <td>Retour à la liste</td>
+            <td>Détail → Accueil</td>
+            <td><code>router.push("/")</code> + restauration des filtres depuis <code>searchParams</code></td>
+        </tr>
+        <tr>
+            <td>Réf client renseignée</td>
+            <td>Accueil → Détail</td>
+            <td>Navigation directe vers l'annonce correspondante</td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <!-- ========== LOCAL ========== -->
+    <h2 id="local">🚀 Lancer le projet en local</h2>
+
+    <pre><code># Installer les dépendances
+npm install
+
+# Démarrer le serveur de développement
+npm run dev</code></pre>
+
+    <p>L'application est accessible sur <strong>http://localhost:3000</strong>.</p>
+
+    <div class="info-box">
+        <strong>ℹ️ Pré-requis</strong> : Node.js 20+ installé. L'environnement INTEG nécessite un accès au réseau
+        interne pour joindre le domaine <code>.local</code>.
+    </div>
+
+    <hr>
+
+    <!-- ========== EVOLUTIONS ========== -->
+    <h2 id="evolutions">📋 Évolutions prévues</h2>
+
+    <table>
+        <tr>
+            <th>Priorité</th>
+            <th>Fonctionnalité</th>
+            <th>Statut</th>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green">✅</span></td>
+            <td>Export PDF de la page détail (impression navigateur)</td>
+            <td>Terminé</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green">✅</span></td>
+            <td>Export JSON du résultat de comparaison (page détail)</td>
+            <td>Terminé</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-green">✅</span></td>
+            <td>Export CSV de la liste des annonces (page accueil)</td>
+            <td>Terminé</td>
+        </tr>
+        <tr>
+            <td><span class="badge badge-blue">🔵</span></td>
+            <td>Stratégie de déploiement/hébergement</td>
+            <td>À définir</td>
+        </tr>
+    </table>
+
+</body>
+
+</html>

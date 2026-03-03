@@ -1,0 +1,9 @@
+services:
+  validateur-forge:
+    build: .
+    container_name: validateur-forge
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_TLS_REJECT_UNAUTHORIZED=0

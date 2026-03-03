@@ -1,0 +1,593 @@
+<template>
+  <div>
+    <!-- Bouton retour -->
+    <div class="mb-6">
+      <button
+        @click="goBack"
+        class="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-emerald-400 transition-colors group"
+      >
+        <svg class="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour à la liste
+      </button>
+    </div>
+
+    <!-- Pas de données -->
+    <div v-if="!prodListing && !integListing" class="text-center py-20">
+      <div class="w-20 h-20 mx-auto mb-6 rounded-2xl bg-slate-800/60 border border-slate-700/30 flex items-center justify-center">
+        <svg class="w-10 h-10 text-slate-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z" />
+        </svg>
+      </div>
+      <h3 class="text-lg font-semibold text-slate-400 mb-2">Aucune annonce sélectionnée</h3>
+      <p class="text-sm text-slate-500 mb-6">Retournez à la liste pour sélectionner une annonce à comparer.</p>
+      <button
+        @click="goBack"
+        class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold py-2.5 px-6 rounded-lg transition-all duration-200 shadow-lg shadow-emerald-500/20"
+      >
+        Retour à la liste
+      </button>
+    </div>
+
+    <!-- Comparaison détaillée -->
+    <div v-else class="space-y-6">
+      <!-- Titre de l'annonce -->
+      <div class="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl p-5 shadow-xl">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-bold text-slate-200">Comparaison PROD vs INTEG</h2>
+            <p class="text-sm text-slate-400">
+              Annonce {{ selectedRef }} — {{ getMainTitle() }}
+            </p>
+            <p v-if="searchParams.partenaire || searchParams.codeAgence" class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              {{ searchParams.partenaire }}<span class="text-slate-600">·</span>Agence {{ searchParams.codeAgence }}
+              <img
+                v-if="searchParams.mediaId === '1'"
+                src="/logos/fi.svg"
+                alt="Figaro Immobilier"
+                class="w-6 h-6 rounded ml-1.5"
+              />
+              <img
+                v-if="searchParams.mediaId === '9'"
+                src="/logos/plf.svg"
+                alt="Propriétés Le Figaro"
+                class="w-6 h-6 rounded ml-1.5"
+              />
+            </p>
+            <div class="flex flex-wrap items-center gap-2 mt-2">
+              <button
+                v-if="prodListing"
+                @click="openListingUrl('PROD')"
+                class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-sky-300 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/40 hover:border-sky-500/30 rounded-lg px-2.5 py-1.5 transition-all"
+                :title="getListingUrl('PROD')"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                JSON PROD
+              </button>
+              <button
+                v-if="integListing"
+                @click="openListingUrl('INTEG')"
+                class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-amber-300 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/40 hover:border-amber-500/30 rounded-lg px-2.5 py-1.5 transition-all"
+                :title="getListingUrl('INTEG')"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                JSON INTEG
+              </button>
+              <span class="w-px h-4 bg-slate-700 mx-1"></span>
+              <button
+                @click="exportPdf"
+                class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-300 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/40 hover:border-emerald-500/30 rounded-lg px-2.5 py-1.5 transition-all"
+                title="Imprimer / Exporter en PDF"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Imprimer PDF
+              </button>
+              <button
+                @click="exportComparisonJson"
+                class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-emerald-300 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/40 hover:border-emerald-500/30 rounded-lg px-2.5 py-1.5 transition-all"
+                title="Exporter le résultat de comparaison en JSON"
+              >
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Export comparaison
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Résumé global -->
+      <div class="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+        <h2 class="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+          <svg class="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+          </svg>
+          Résumé
+        </h2>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex-1 min-w-[120px] bg-slate-800/60 rounded-xl p-4 text-center border border-slate-700/30">
+            <p class="text-2xl font-bold text-slate-100">{{ totalFields }}</p>
+            <p class="text-xs text-slate-400 mt-1">Champs comparés</p>
+          </div>
+          <div class="flex-1 min-w-[120px] bg-emerald-900/20 rounded-xl p-4 text-center border border-emerald-500/20">
+            <p class="text-2xl font-bold text-emerald-400">{{ matchCount }}</p>
+            <p class="text-xs text-slate-400 mt-1">Identiques</p>
+          </div>
+          <div class="flex-1 min-w-[120px] bg-red-900/20 rounded-xl p-4 text-center border border-red-500/20">
+            <p class="text-2xl font-bold text-red-400">{{ diffCount }}</p>
+            <p class="text-xs text-slate-400 mt-1">Différences</p>
+          </div>
+          <div v-if="missingIntegCount > 0" class="flex-1 min-w-[120px] bg-amber-900/20 rounded-xl p-4 text-center border border-amber-500/20">
+            <p class="text-2xl font-bold text-amber-400">{{ missingIntegCount }}</p>
+            <p class="text-xs text-amber-300/70 mt-1">Manque INTEG</p>
+          </div>
+          <div v-if="missingProdCount > 0" class="flex-1 min-w-[120px] bg-sky-900/20 rounded-xl p-4 text-center border border-sky-500/20">
+            <p class="text-2xl font-bold text-sky-400">{{ missingProdCount }}</p>
+            <p class="text-xs text-sky-300/70 mt-1">Manque PROD</p>
+          </div>
+          <div v-if="naCount > 0" class="flex-1 min-w-[120px] bg-slate-800/40 rounded-xl p-4 text-center border border-slate-600/20">
+            <p class="text-2xl font-bold text-slate-400">{{ naCount }}</p>
+            <p class="text-xs text-slate-400 mt-1">Non transmises</p>
+          </div>
+        </div>
+
+        <!-- Bandeau Succès si 0 différence et 0 manquante -->
+        <div v-if="diffCount === 0 && missingOneCount === 0 && totalFields > 0" class="mt-4 bg-emerald-900/30 border border-emerald-500/30 rounded-xl px-5 py-3 flex items-center gap-3">
+          <svg class="w-6 h-6 text-emerald-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-sm font-semibold text-emerald-300">✅ Succès — PROD et INTEG sont ISO</p>
+        </div>
+        <!-- Bandeau Avertissement si 0 diff mais des manquantes -->
+        <div v-else-if="diffCount === 0 && missingOneCount > 0 && totalFields > 0" class="mt-4 bg-amber-900/30 border border-amber-500/30 rounded-xl px-5 py-3 flex items-center gap-3">
+          <svg class="w-6 h-6 text-amber-400 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+          <p class="text-sm font-semibold text-amber-300">⚠️ Attention — {{ missingOneCount }} donnée(s) présente(s) d'un côté uniquement</p>
+        </div>
+      </div>
+
+      <!-- Vignettes photos : PROD (gauche) / INTEG (droite) -->
+      <div class="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl p-6 shadow-xl">
+        <button @click="photosExpanded = !photosExpanded" class="w-full flex items-center justify-between group cursor-pointer">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">📸</span>
+            <h3 class="text-base font-semibold text-slate-200">Photos</h3>
+            <span class="text-xs text-slate-500">PROD: {{ prodPhotos.length }} · INTEG: {{ integPhotos.length }}</span>
+          </div>
+          <svg
+            class="w-5 h-5 text-slate-400 group-hover:text-slate-200 transition-all duration-200"
+            :class="{ 'rotate-180': photosExpanded }"
+            fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+
+        <div v-show="photosExpanded" class="mt-5 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Photos PROD (gauche) -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-2.5 h-2.5 rounded-full bg-sky-400"></div>
+              <span class="text-sm font-semibold text-sky-300">PROD</span>
+              <span class="text-xs text-slate-500">({{ prodPhotos.length }} photo{{ prodPhotos.length > 1 ? 's' : '' }})</span>
+            </div>
+            <div v-if="prodPhotos.length === 0" class="bg-slate-800/40 rounded-lg p-4 text-center">
+              <p class="text-xs text-slate-500">Aucune photo</p>
+            </div>
+            <div v-else class="grid grid-cols-4 xl:grid-cols-5 gap-2">
+              <div
+                v-for="(photo, idx) in prodPhotos"
+                :key="'prod-photo-' + idx"
+                class="aspect-square rounded-lg overflow-hidden bg-slate-800 border border-slate-700/30"
+              >
+                <img
+                  :src="getPhotoUrl(photo)"
+                  :alt="'PROD photo ' + (idx + 1)"
+                  class="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Photos INTEG (droite) -->
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="w-2.5 h-2.5 rounded-full bg-amber-400"></div>
+              <span class="text-sm font-semibold text-amber-300">INTEG</span>
+              <span class="text-xs text-slate-500">({{ integPhotos.length }} photo{{ integPhotos.length > 1 ? 's' : '' }})</span>
+            </div>
+            <div v-if="integPhotos.length === 0" class="bg-slate-800/40 rounded-lg p-4 text-center">
+              <p class="text-xs text-slate-500">Aucune photo</p>
+            </div>
+            <div v-else class="grid grid-cols-4 xl:grid-cols-5 gap-2">
+              <div
+                v-for="(photo, idx) in integPhotos"
+                :key="'integ-photo-' + idx"
+                class="aspect-square rounded-lg overflow-hidden bg-slate-800 border border-slate-700/30"
+              >
+                <img
+                  :src="getPhotoUrl(photo)"
+                  :alt="'INTEG photo ' + (idx + 1)"
+                  class="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tableaux par catégorie -->
+      <div v-for="category in comparisonCategories" :key="category.name" class="bg-slate-900/80 backdrop-blur border border-slate-700/50 rounded-2xl overflow-hidden shadow-xl">
+        <div class="px-6 py-4 border-b border-slate-700/50 flex items-center gap-3">
+          <span class="text-xl">{{ category.icon }}</span>
+          <h3 class="text-base font-semibold text-slate-200">{{ category.name }}</h3>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-slate-400 text-xs uppercase tracking-wider">
+                <th class="text-left px-6 py-3 w-1/4">Champ</th>
+                <th class="text-left px-6 py-3">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+                    Valeur PROD
+                  </span>
+                </th>
+                <th class="text-left px-6 py-3">
+                  <span class="inline-flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    Valeur INTEG
+                  </span>
+                </th>
+                <th class="text-center px-6 py-3 w-1/8">Statut</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="(field, idx) in category.fields"
+                :key="field.path"
+                :class="[
+                  idx % 2 === 0 ? 'bg-slate-800/30' : 'bg-slate-800/10',
+                  'hover:bg-slate-700/30 transition-colors'
+                ]"
+              >
+                <td class="px-6 py-3 font-medium text-slate-300">{{ field.label }}</td>
+                <td class="px-6 py-3 text-slate-200 font-mono text-xs">{{ getFieldValue(prodListing, field.path) }}</td>
+                <td class="px-6 py-3 text-slate-200 font-mono text-xs">{{ getFieldValue(integListing, field.path) }}</td>
+                <td class="px-6 py-3 text-center">
+                  <span
+                    :class="getStatusClass(field)"
+                    class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold transition-all"
+                  >
+                    <span class="w-1.5 h-1.5 rounded-full" :class="getStatusDotClass(field)" />
+                    {{ getStatusText(field) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+useHead({
+  title: 'Validateur Forge — Détail comparatif',
+})
+
+const router = useRouter()
+const route = useRoute()
+
+const { selectedProdListing, selectedIntegListing, selectedRef, selectListing, searchParams } = useCompare()
+
+// Si la ref vient de l'URL (rechargement de page), la restaurer
+const refFromQuery = route.query.ref as string
+if (refFromQuery && !selectedRef.value) {
+  selectListing(decodeURIComponent(refFromQuery))
+}
+
+const prodListing = computed(() => selectedProdListing.value)
+const integListing = computed(() => selectedIntegListing.value)
+
+// Toggle photos
+const photosExpanded = ref(true)
+
+// Copy URL spécifique à l'annonce
+const copiedEnv = ref('')
+
+const LISTING_BASE_URLS: Record<string, string> = {
+  PROD: 'https://explorimmobox.explorimmo.com/v2/listings.json?api_key=immobox',
+  INTEG: 'https://imb-integration.vip.adencf.local/v2/listings.json?api_key=immobox',
+}
+
+function getListingUrl(env: string): string {
+  const listing = env === 'PROD' ? prodListing.value : integListing.value
+  const reference = listing?.property?.reference
+  if (!reference) return ''
+  return `${LISTING_BASE_URLS[env]}&filters[property.reference]=${encodeURIComponent(reference)}&start=0&limit=1`
+}
+
+function openListingUrl(env: string) {
+  const url = getListingUrl(env)
+  if (url) window.open(url, '_blank')
+}
+
+// Extraire les photos
+const prodPhotos = computed(() => {
+  if (!prodListing.value) return []
+  return prodListing.value.photos || []
+})
+
+const integPhotos = computed(() => {
+  if (!integListing.value) return []
+  return integListing.value.photos || []
+})
+
+function getPhotoUrl(photo: any): string {
+  if (typeof photo === 'string') return photo
+  if (photo?.src) {
+    if (typeof photo.src === 'string') return photo.src
+    // API Immobox uses: s (small), xl (extra-large), raw (original)
+    return photo.src.xl || photo.src.raw || photo.src.s || photo.src.medium || photo.src.small || photo.src.large || photo.src.original || ''
+  }
+  return photo?.url || photo?.uri || ''
+}
+
+function goBack() {
+  router.push('/')
+}
+
+function getMainTitle(): string {
+  const listing = prodListing.value || integListing.value
+  if (!listing) return '—'
+  const type = listing.property_type?.name || 'Bien'
+  const city = listing.property?.address?.city || ''
+  const ref = listing.property?.reference || ''
+  return [ref, type, city].filter(Boolean).join(' — ')
+}
+
+// Définition des catégories de comparaison (sans Médias car les photos sont affichées en vignettes)
+const fieldDefinitions = [
+  {
+    name: 'Identification',
+    icon: '🏷️',
+    fields: [
+      { label: 'ID', path: 'id' },
+      { label: 'Code passerelle', path: 'property.gateway_code' },
+      { label: 'Passerelle', path: '_gatewayName' },
+      { label: 'Réf. mandat', path: 'fields.mandat_reference_fr' },
+    ],
+  },
+  {
+    name: 'Localisation',
+    icon: '📍',
+    fields: [
+      { label: 'Ville', path: 'property.address.city' },
+      { label: 'Code Postal', path: 'property.address.zipcode' },
+      { label: 'Quartier', path: 'fields.quartier_fr' },
+    ],
+  },
+  {
+    name: 'Caractéristiques',
+    icon: '🏠',
+    fields: [
+      { label: 'Type de transaction', path: 'property.property_deal.name' },
+      { label: 'Type de bien', path: '_propertyTypeName' },
+      { label: 'Famille de bien', path: '_propertyTypeFamilyName' },
+      { label: 'Surface (m²)', path: 'fields.surface_fr' },
+      { label: 'Surface terrain (m²)', path: 'fields.surface_terrain_fr' },
+      { label: 'Pièces', path: 'fields.nb_piece_fr' },
+      { label: 'Chambres', path: 'fields.nb_chambre_fr' },
+      { label: 'Confort', path: 'fields.confort_fr' },
+      { label: 'Exposition', path: 'fields.exposition_fr' },
+      { label: 'Salles de bains', path: 'fields.nb_sd_bains_fr' },
+      { label: 'Visite virtuelle', path: 'fields.visite_virtuelle_fr' },
+      { label: 'Copropriété', path: 'fields.copropriete_fr' },
+      { label: 'État', path: 'fields.etat_fr' },
+    ],
+  },
+  {
+    name: 'Descriptif',
+    icon: '📝',
+    fields: [
+      { label: 'Description', path: 'fields.description_fr' },
+    ],
+  },
+  {
+    name: 'DPE',
+    icon: '⚡',
+    fields: [
+      { label: 'Date DPE', path: 'fields.date_dpe_fr' },
+      { label: 'Consommation énergie', path: 'fields.dpe_valeur_consommation_fr' },
+      { label: 'Classe GES', path: 'fields.dpe_etiquette_gaz_effet_serre_fr' },
+      { label: 'Classe énergie', path: 'fields.dpe_etiquette_consommation_fr' },
+      { label: 'Émission GES', path: 'fields.dpe_valeur_gaz_effet_serre_fr' },
+    ],
+  },
+  {
+    name: 'Contact',
+    icon: '👤',
+    fields: [
+      { label: 'Email', path: 'fields.contact_email_fr' },
+      { label: 'Tél. négociateur', path: 'fields.nego_tel_fr' },
+      { label: 'Téléphone', path: 'fields.contact_tel_fr' },
+      { label: 'Nom contact', path: 'fields.contact_name_fr' },
+    ],
+  },
+  {
+    name: 'Financier',
+    icon: '💰',
+    fields: [
+      { label: 'Prix', path: 'fields.price_fr' },
+      { label: 'Honoraires', path: 'fields.honoraires_fr' },
+      { label: 'Prix nous consulter', path: 'fields.prix_nous_consulter_fr' },
+      { label: 'Taxe foncière', path: 'fields.taxe_fonciere_fr' },
+      { label: 'Charge honoraires', path: 'fields.charge_honoraires_fr' },
+    ],
+  },
+  {
+    name: 'Médias',
+    icon: '📷',
+    fields: [
+      { label: 'Nombre de photos', path: '_photoCount' },
+      { label: 'Vidéo', path: 'fields.video_fr' },
+    ],
+  },
+]
+
+// Comparaison des champs
+const comparisonCategories = computed(() => {
+  return fieldDefinitions.map((cat) => ({
+    ...cat,
+    fields: cat.fields.map((field: any) => ({
+      ...field,
+      prodValue: getFieldValue(prodListing.value, field.path),
+      integValue: getFieldValue(integListing.value, field.path),
+    })),
+  }))
+})
+
+// Statistiques
+const totalFields = computed(() => comparisonCategories.value.reduce((sum: number, cat: any) => sum + cat.fields.length, 0))
+const matchCount = computed(() => comparisonCategories.value.reduce((sum: number, cat: any) => sum + cat.fields.filter((f: any) => getStatusText(f) === 'OK').length, 0))
+const diffCount = computed(() => comparisonCategories.value.reduce((sum: number, cat: any) => sum + cat.fields.filter((f: any) => getStatusText(f) === 'DIFF').length, 0))
+// Données manquantes d'un seul côté (potentiel dysfonctionnement)
+const missingOneCount = computed(() => missingIntegCount.value + missingProdCount.value)
+const missingIntegCount = computed(() => comparisonCategories.value.reduce((sum: number, cat: any) => sum + cat.fields.filter((f: any) => getStatusText(f) === 'MANQUE INTEG').length, 0))
+const missingProdCount = computed(() => comparisonCategories.value.reduce((sum: number, cat: any) => sum + cat.fields.filter((f: any) => getStatusText(f) === 'MANQUE PROD').length, 0))
+// Données absentes des deux côtés (non transmises par la source)
+const naCount = computed(() => comparisonCategories.value.reduce((sum: number, cat: any) => sum + cat.fields.filter((f: any) => getStatusText(f) === 'N/A').length, 0))
+
+function getFieldValue(obj: any, path: string): string {
+  if (!obj) return '—'
+
+  // Champs spéciaux calculés
+  if (path === '_photoCount') {
+    const photos = obj.photos || []
+    return String(photos.length)
+  }
+  if (path === '_gatewayName') {
+    const gw = obj.gateways
+    if (Array.isArray(gw) && gw.length > 0) return gw[0]?.name || '—'
+    return '—'
+  }
+  if (path === '_propertyTypeName') {
+    return obj.property_type?.name || '—'
+  }
+  if (path === '_propertyTypeFamilyName') {
+    return obj.property_type?.property_type_family?.name || '—'
+  }
+
+  const parts = path.split('.')
+  let value = obj
+  for (const part of parts) {
+    if (value == null) return '—'
+    value = value[part]
+  }
+
+  if (value == null || value === '') return '—'
+  if (typeof value === 'object') {
+    if (Array.isArray(value)) return JSON.stringify(value)
+    if (value.name) return String(value.name)
+    return JSON.stringify(value)
+  }
+  return String(value)
+}
+
+function getStatusText(field: any): string {
+  const pv = String(field.prodValue ?? '—')
+  const iv = String(field.integValue ?? '—')
+  if (pv === '—' && iv === '—') return 'N/A'
+  if (pv !== '—' && iv === '—') return 'MANQUE INTEG'
+  if (pv === '—' && iv !== '—') return 'MANQUE PROD'
+  return normalize(pv) === normalize(iv) ? 'OK' : 'DIFF'
+}
+
+function getStatusClass(field: any): string {
+  const status = getStatusText(field)
+  if (status === 'OK') return 'bg-emerald-900/40 text-emerald-300 border border-emerald-500/20'
+  if (status === 'DIFF') return 'bg-red-900/40 text-red-300 border border-red-500/20'
+  if (status === 'MANQUE INTEG') return 'bg-amber-900/40 text-amber-300 border border-amber-500/20'
+  if (status === 'MANQUE PROD') return 'bg-sky-900/40 text-sky-300 border border-sky-500/20'
+  return 'bg-slate-800/40 text-slate-400 border border-slate-600/20'
+}
+
+function getStatusDotClass(field: any): string {
+  const status = getStatusText(field)
+  if (status === 'OK') return 'bg-emerald-400'
+  if (status === 'DIFF') return 'bg-red-400'
+  if (status === 'MANQUE INTEG') return 'bg-amber-400'
+  if (status === 'MANQUE PROD') return 'bg-sky-400'
+  return 'bg-slate-500'
+}
+
+function normalize(value: string): string {
+  return value.toString().trim().toLowerCase()
+}
+
+// ── Exports ──────────────────────────────────────────────────
+
+function exportPdf() {
+  window.print()
+}
+
+function exportComparisonJson() {
+  const data = {
+    reference: selectedRef.value,
+    partenaire: searchParams.value.partenaire,
+    codeAgence: searchParams.value.codeAgence,
+    mediaId: searchParams.value.mediaId,
+    exportDate: new Date().toISOString(),
+    summary: {
+      totalFields: totalFields.value,
+      identiques: matchCount.value,
+      differences: diffCount.value,
+      manqueInteg: missingIntegCount.value,
+      manqueProd: missingProdCount.value,
+      nonTransmises: naCount.value,
+    },
+    categories: comparisonCategories.value.map((cat: any) => ({
+      name: cat.name,
+      fields: cat.fields.map((field: any) => ({
+        label: field.label,
+        path: field.path,
+        prodValue: field.prodValue,
+        integValue: field.integValue,
+        status: getStatusText(field),
+      })),
+    })),
+  }
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `comparaison_${selectedRef.value || 'export'}_${new Date().toISOString().slice(0, 10)}.json`
+  a.click()
+  URL.revokeObjectURL(url)
+}
+</script>
