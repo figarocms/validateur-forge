@@ -489,13 +489,31 @@ function getNestedValue(obj: any, path: string): string {
   return String(value).trim().toLowerCase()
 }
 
+// Compare two values for equality; for arrays, order is ignored (same set = equal)
+function valuesEqualForCompare(pv: string, iv: string): boolean {
+  if (pv === iv) return true
+  try {
+    const a = JSON.parse(pv)
+    const b = JSON.parse(iv)
+    if (Array.isArray(a) && Array.isArray(b)) {
+      const sortKey = (x: any) => (typeof x === 'object' && x !== null ? JSON.stringify(x) : String(x))
+      const sortedA = [...a].sort((x, y) => sortKey(x).localeCompare(sortKey(y)))
+      const sortedB = [...b].sort((x, y) => sortKey(x).localeCompare(sortKey(y)))
+      return JSON.stringify(sortedA) === JSON.stringify(sortedB)
+    }
+  } catch (_) {
+    /* not JSON or not arrays */
+  }
+  return false
+}
+
 function getDiffCount(prod: any, integ: any): number {
   let diffs = 0
   for (const path of compareFields) {
     const pv = getNestedValue(prod, path)
     const iv = getNestedValue(integ, path)
-    // Ne compter que si les 2 valeurs existent et sont différentes
-    if (pv && iv && pv !== iv) diffs++
+    // Ne compter que si les 2 valeurs existent et sont différentes (array order ignored)
+    if (pv && iv && !valuesEqualForCompare(pv, iv)) diffs++
   }
   return diffs
 }

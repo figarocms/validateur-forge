@@ -201,7 +201,7 @@
               >
                 <img
                   :src="getPhotoUrl(photo)"
-                  :alt="'PROD photo ' + (idx + 1)"
+                  :alt="'PROD photo ' + (idx as number + 1)"
                   class="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
                   loading="lazy"
                 />
@@ -227,7 +227,7 @@
               >
                 <img
                   :src="getPhotoUrl(photo)"
-                  :alt="'INTEG photo ' + (idx + 1)"
+                  :alt="'INTEG photo ' + (idx as number + 1)"
                   class="w-full h-full object-cover hover:scale-110 transition-transform duration-200"
                   loading="lazy"
                 />
@@ -524,6 +524,7 @@ function getStatusText(field: any): string {
   if (pv === '—' && iv === '—') return 'N/A'
   if (pv !== '—' && iv === '—') return 'MANQUE INTEG'
   if (pv === '—' && iv !== '—') return 'MANQUE PROD'
+  if (valuesEqualForCompare(pv, iv)) return 'OK'
   return normalize(pv) === normalize(iv) ? 'OK' : 'DIFF'
 }
 
@@ -547,6 +548,24 @@ function getStatusDotClass(field: any): string {
 
 function normalize(value: string): string {
   return value.toString().trim().toLowerCase()
+}
+
+// Compare two values for equality; for arrays, order is ignored (same set = equal)
+function valuesEqualForCompare(pv: string, iv: string): boolean {
+  if (pv === iv) return true
+  try {
+    const a = JSON.parse(pv)
+    const b = JSON.parse(iv)
+    if (Array.isArray(a) && Array.isArray(b)) {
+      const sortKey = (x: any) => (typeof x === 'object' && x !== null ? JSON.stringify(x) : String(x))
+      const sortedA = [...a].sort((x, y) => sortKey(x).localeCompare(sortKey(y)))
+      const sortedB = [...b].sort((x, y) => sortKey(x).localeCompare(sortKey(y)))
+      return JSON.stringify(sortedA) === JSON.stringify(sortedB)
+    }
+  } catch (_) {
+    /* not JSON or not arrays */
+  }
+  return false
 }
 
 // ── Exports ──────────────────────────────────────────────────
