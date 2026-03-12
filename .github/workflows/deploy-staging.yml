@@ -46,8 +46,10 @@
             service: ${{ env.SERVICE_NAME }}
             region: ${{ env.REGION }}
             image: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+            service_account: vibecoding-deploy@project-staging1.iam.gserviceaccount.com
             flags: |
-              --vpc-connector=vpcconn
+              --network=staging
+              --subnet=net-staging 
               --vpc-egress=all-traffic
               --ingress=internal-and-cloud-load-balancing
               --memory=512Mi
