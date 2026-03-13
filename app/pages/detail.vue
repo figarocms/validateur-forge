@@ -55,22 +55,6 @@
               — {{ getMainTitle() }}
               <span v-if="refCopied" class="text-primary-400 text-xs">Copié</span>
             </p>
-            <div class="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
-              <div v-if="prodListing" class="flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-sky-300">PROD:</span>
-                <span>{{ prodModifiedDate }}</span>
-              </div>
-              <div v-if="integListing" class="flex items-center gap-1.5">
-                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span class="text-amber-300">INTEG:</span>
-                <span>{{ integModifiedDate }}</span>
-              </div>
-            </div>
             <p v-if="searchParams.partenaire || searchParams.codeAgence" class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
               <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
@@ -95,16 +79,22 @@
                 class="w-6 h-6 rounded ml-1.5"
               />
             </p>
-            <p v-if="prodListing || integListing" class="text-xs text-slate-500 mt-2 flex flex-wrap items-center gap-x-4 gap-y-1">
-              <span v-if="prodListing" class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-                Dernière modif. PROD : {{ getLastModification(prodListing) }}
-              </span>
-              <span v-if="integListing" class="flex items-center gap-1.5">
-                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                Dernière modif. INTEG : {{ getLastModification(integListing) }}
-              </span>
-            </p>
+            <div v-if="prodListing || integListing" class="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-500">
+              <div v-if="prodListing" class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-sky-300">PROD:</span>
+                <span>{{ prodModifiedDate }}</span>
+              </div>
+              <div v-if="integListing" class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-amber-300">INTEG:</span>
+                <span>{{ integModifiedDate }}</span>
+              </div>
+            </div>
             <div class="flex flex-wrap items-center gap-2 mt-2">
               <button
                 v-if="prodListing"

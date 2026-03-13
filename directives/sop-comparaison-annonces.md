@@ -42,6 +42,7 @@ L'environnement INTEG utilise un certificat SSL auto-signé (`.local`). Le proxy
 | 🏠 Caractéristiques | Type, Pièces, Chambres, Surface, Terrain, Étage, Année |
 | ⚡ DPE | Énergie (valeur/classe), GES (valeur/classe) |
 | 👤 Contact | Nom, Email, Téléphone |
+| 🛋️ Equipement | Conforts, Meublé, Type Cuisine, Type Chauffage  |
 | 💰 Financier | Prix, Charges, Honoraires |
 | 📸 Médias | Nombre de photos |
 | 🏗️ Programme Neuf | Titre, livraison, fiscal, parking, visite 3D, bureau de vente |
